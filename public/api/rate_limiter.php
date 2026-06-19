@@ -3,27 +3,28 @@ require_once 'config.php';
 
 class RateLimiter {
     private $pdo;
-    private $ip;
+    private $ipHash;
     
     public function __construct($ip) {
         $this->pdo = getDbConnection();
-        $this->ip = $ip;
+        // Store only the hashed IP (anonymized) — never the real IP
+        $this->ipHash = hashClientIp($ip);
     }
     
     /**
-     * Check if the IP has exceeded the rate limit
+     * Check if the user has exceeded the rate limit
      * @return array ['allowed' => bool, 'remaining' => int]
      */
     public function checkLimit() {
         $today = date('Y-m-d');
         
-        // Get or create rate limit record for today
+        // Get or create rate limit record for today using hashed IP
         $stmt = $this->pdo->prepare("
             SELECT request_count 
             FROM rate_limits 
             WHERE ip_address = ? AND reset_date = ?
         ");
-        $stmt->execute([$this->ip, $today]);
+        $stmt->execute([$this->ipHash, $today]);
         $record = $stmt->fetch();
         
         if ($record) {
@@ -46,7 +47,7 @@ class RateLimiter {
     }
     
     /**
-     * Increment the request count for the IP
+     * Increment the request count for the user
      * @return array ['success' => bool, 'remaining' => int]
      */
     public function incrementCount() {
@@ -67,7 +68,7 @@ class RateLimiter {
                 ];
             }
             
-            // Insert or update record
+            // Insert or update record using hashed IP
             $stmt = $this->pdo->prepare("
                 INSERT INTO rate_limits (ip_address, request_count, reset_date, last_request)
                 VALUES (?, 1, ?, NOW())
@@ -75,7 +76,7 @@ class RateLimiter {
                     request_count = request_count + 1,
                     last_request = NOW()
             ");
-            $stmt->execute([$this->ip, $today]);
+            $stmt->execute([$this->ipHash, $today]);
             
             $this->pdo->commit();
             
@@ -94,7 +95,7 @@ class RateLimiter {
     }
     
     /**
-     * Get remaining requests for the IP
+     * Get remaining requests for the user
      * @return int
      */
     public function getRemainingRequests() {

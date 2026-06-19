@@ -16,6 +16,10 @@ define('GROQ_API_KEY', getenv('GROQ_API_KEY') ?: '');
 define('GROQ_API_URL', 'https://api.groq.com/openai/v1/chat/completions');
 define('GROQ_MODEL', 'llama-3.3-70b-versatile'); // Fast and good model
 
+// Encryption key for data protection (messages + IP hashing)
+// IMPORTANT: Change this in production via environment variable!
+define('ENCRYPTION_KEY', getenv('ENCRYPTION_KEY') ?: 'giammai-default-key-change-me-now');
+
 // Rate limiting
 define('MAX_REQUESTS_PER_DAY', 10);
 
@@ -67,6 +71,47 @@ function getClientIp() {
     }
     
     return $ip;
+}
+
+/**
+ * Hash client IP with double MD5 + salt for anonymization.
+ * One-way hash: cannot be reversed to original IP.
+ */
+function hashClientIp($ip) {
+    $salt = ENCRYPTION_KEY;
+    return hash('md5', hash('md5', $ip . $salt));
+}
+
+/**
+ * Encrypt a message using AES-256-CBC.
+ * Returns base64-encoded ciphertext (IV + encrypted data).
+ */
+function encryptMessage($message) {
+    $key = hash('sha256', ENCRYPTION_KEY, true);
+    $iv = random_bytes(16);
+    $encrypted = openssl_encrypt($message, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+    if ($encrypted === false) {
+        throw new Exception("Encryption failed");
+    }
+    return base64_encode($iv . $encrypted);
+}
+
+/**
+ * Decrypt a message encrypted with encryptMessage().
+ */
+function decryptMessage($encryptedMessage) {
+    $key = hash('sha256', ENCRYPTION_KEY, true);
+    $data = base64_decode($encryptedMessage);
+    if ($data === false || strlen($data) < 16) {
+        throw new Exception("Invalid encrypted data");
+    }
+    $iv = substr($data, 0, 16);
+    $encrypted = substr($data, 16);
+    $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', $key, OPENSSL_RAW_DATA, $iv);
+    if ($decrypted === false) {
+        throw new Exception("Decryption failed");
+    }
+    return $decrypted;
 }
 
 // Send JSON response

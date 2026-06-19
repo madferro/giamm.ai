@@ -18,17 +18,19 @@ try {
     }
     
     $userMessage = trim($data['message']);
+    $tone = isset($data['tone']) ? $data['tone'] : 'ironic';
     
     // Validate message length
     if (strlen($userMessage) > 500) {
         sendError("Message too long (max 500 characters)");
     }
     
-    // Get client IP
-    $ip = getClientIp();
+    // Get client IP and hash it immediately (never store raw IP)
+    $rawIp = getClientIp();
+    $hashedIp = hashClientIp($rawIp);
     
     // Check and increment rate limit
-    $rateLimiter = new RateLimiter($ip);
+    $rateLimiter = new RateLimiter($rawIp);
     $limitCheck = $rateLimiter->checkLimit();
     
     if (!$limitCheck['allowed']) {
@@ -48,21 +50,24 @@ try {
     // Get AI response
     try {
         $groqClient = new GroqClient();
-        $aiResponse = $groqClient->chat($userMessage);
+        $aiResponse = $groqClient->chat($userMessage, $tone);
     } catch (Exception $e) {
         error_log("Groq API error: " . $e->getMessage());
         // Use fallback response if API fails
         $aiResponse = GroqClient::getFallbackResponse();
     }
     
-    // Save to chat history
+    // Save to chat history with encryption
     try {
         $pdo = getDbConnection();
+        $encryptedUserMessage = encryptMessage($userMessage);
+        $encryptedAiResponse = encryptMessage($aiResponse);
+        
         $stmt = $pdo->prepare("
             INSERT INTO chat_history (ip_address, user_message, ai_response)
             VALUES (?, ?, ?)
         ");
-        $stmt->execute([$ip, $userMessage, $aiResponse]);
+        $stmt->execute([$hashedIp, $encryptedUserMessage, $encryptedAiResponse]);
     } catch (Exception $e) {
         error_log("Failed to save chat history: " . $e->getMessage());
         // Continue anyway, don't fail the request
