@@ -15,12 +15,18 @@ const tones = [
     id: 'ironic',
     label: 'Ironico',
     subtitle: 'Amico cinico che ti prende in giro',
-    icon: `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M8 14c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"/><path d="M16 14c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3z"/><path d="M12 20c-3.87 0-7-3.13-7-7 0-1.5.47-2.89 1.27-4.03C7.5 8.33 9.67 7 12 7s4.5 1.33 5.73 1.97C18.53 10.11 19 11.5 19 13c0 3.87-3.13 7-7 7z"/></svg>`,
+    icon: `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1" fill="currentColor" stroke="none"/><path d="M8 14C9.5 16.5 14.5 16.5 16 14"/></svg>`,
+  },
+  {
+    id: 'gentle',
+    label: 'Gentile',
+    subtitle: 'Rifiuto cordiale e rispettoso',
+    icon: `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`,
   },
   {
     id: 'professional',
     label: 'Professionale',
-    subtitle: 'Consulente McKinsey con slide deck',
+    subtitle: 'Consulente con slide deck',
     icon: `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
   },
   {
@@ -28,6 +34,12 @@ const tones = [
     label: 'Arrogante',
     subtitle: 'Diva dello spettacolo, eye-roll virtuale',
     icon: `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line x1="17.5" y1="7.5" x2="17.5" y2="7.5"/></svg>`,
+  },
+  {
+    id: 'vicious',
+    label: 'Perfido',
+    subtitle: 'Nessuna pietà, solo verità scomode',
+    icon: `<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7 5L4 2"/><path d="M17 5L20 2"/><path d="M7 9L10 10"/><path d="M17 9L14 10"/><path d="M8 15C10 17.5 14 17.5 16 15"/></svg>`,
   },
 ]
 

@@ -38,3 +38,11 @@ html.dark {
     @apply bg-bg-primary text-text-primary font-sans antialiased min-h-screen;
   }
 }
+
+@layer components {
+  .container {
+    max-width: 960px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
