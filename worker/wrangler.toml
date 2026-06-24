@@ -1,0 +1,20 @@
+name = "giamm-ai-worker"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+# Variabili d'ambiente (secrets da configurare con: wrangler secret put GROQ_API_KEY)
+# GROQ_API_KEY = "your-key-here" (usa wrangler secret put invece di metterlo qui)
+
+[observability]
+enabled = false  # Disabilita log per privacy
+
+# Ambiente di sviluppo locale
+[env.dev]
+name = "giamm-ai-worker-dev"
+
+# Ambiente di produzione
+[env.production]
+name = "giamm-ai-worker"
+routes = [
+  { pattern = "giamm.ai/api/*", zone_name = "giamm.ai" }
+]

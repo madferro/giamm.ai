@@ -1,0 +1,4 @@
+# Cloudflare Worker - Development Environment Variables
+# Copia questo file in .dev.vars e inserisci i tuoi valori
+
+GROQ_API_KEY=your-groq-api-key-here

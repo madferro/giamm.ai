@@ -1,0 +1,16 @@
+{
+  "name": "giamm-ai-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker backend for giamm.ai",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "keywords": ["cloudflare", "worker", "ai", "chat"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}
