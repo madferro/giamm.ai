@@ -43,3 +43,9 @@ Desktop.ini
 
 # Docker (opzionale - se vuoi escludere i container)
 # containers/
+
+# Cloudflare Worker (branch cloudflare)
+worker/.dev.vars
+worker/.wrangler/
+worker/node_modules/
+worker/dist/
