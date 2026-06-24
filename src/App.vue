@@ -189,30 +189,11 @@ async function sendMessage(text) {
 <template>
   <div class="min-h-screen flex flex-col bg-bg-primary text-text-primary">
     <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 h-14 backdrop-blur-xl border-b border-border bg-bg-primary/85 transition-colors duration-200">
+    <header class="fixed top-0 left-0 right-0 z-50 h-14 backdrop-blur-xl bg-bg-primary/70 transition-colors duration-200">
       <div class="container mx-auto px-5 h-full flex items-center justify-between">
         <a href="/" class="flex items-center gap-2 font-bold text-lg tracking-tight text-text-primary">
           giamm<span class="w-2 h-2 rounded-full bg-accent inline-block"></span>ai
         </a>
-        <!-- Scroll to bottom button -->
-        <Transition
-          enter-active-class="transition ease-out duration-200"
-          enter-from-class="opacity-0 -translate-y-2"
-          enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition ease-in duration-150"
-          leave-from-class="opacity-100 translate-y-0"
-          leave-to-class="opacity-0 -translate-y-2"
-        >
-          <button
-            v-if="showScrollButton"
-            @click="scrollToBottom"
-            class="w-10 h-10 rounded-full bg-bg-secondary border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all cursor-pointer z-40"
-          >
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-          </button>
-        </Transition>
         <div class="flex items-center gap-2">
           <div class="text-xs font-medium text-text-muted bg-bg-secondary px-3 py-1.5 rounded-full border border-border">
             <strong class="text-accent">{{ remainingRequests }}</strong> / 10
@@ -295,7 +276,7 @@ async function sendMessage(text) {
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-accent"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 I tuoi dati sono al sicuro?
               </h3>
-              <p>Sì. <strong>Tutte le conversazioni sono salvate solo nel tuo browser</strong> (IndexedDB) e <strong>criptate con AES-256-GCM</strong>. Non salviamo nulla sui nostri server. Non sappiamo chi sei, non ti spiamo e non vendiamo nulla a nessuno. Anche se qualcuno accedesse fisicamente al tuo database locale, vedrebbe solo dati criptati.</p>
+              <p>Sì. <strong>Tutte le conversazioni sono salvate <strong>criptate</strong> nel tuo browser</strong>. Non salviamo nulla sui nostri server. Non sappiamo chi sei, non ti spiamo e non vendiamo nulla a nessuno. Anche se qualcuno accedesse fisicamente al tuo database locale, vedrebbe solo dati criptati.</p>
             </div>
 
             <div>
@@ -303,7 +284,7 @@ async function sendMessage(text) {
                 <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-accent"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                 Come funziona la crittografia?
               </h3>
-              <p>Ogni messaggio viene criptato con <strong>AES-256-GCM</strong> (lo stesso standard usato dalle banche) prima di essere salvato nel tuo browser. Quando riapri la chat, i messaggi vengono automaticamente decriptati solo per te. È come avere una cassaforte digitale nel tuo browser.</p>
+              <p>Ogni messaggio viene criptato con uno dei metodi più sicuri al mondo (lo stesso standard usato dalle banche) prima di essere salvato nel tuo browser. Quando riapri la chat, i messaggi vengono automaticamente decriptati solo per te. È come avere una cassaforte digitale nel tuo browser.</p>
             </div>
 
             <div>
@@ -351,7 +332,6 @@ async function sendMessage(text) {
               :disabled="loading || remainingRequests <= 0"
               :placeholder="remainingRequests <= 0 ? 'Limite giornaliero raggiunto' : 'Scrivi un messaggio...'"
             />
-            <p class="text-center text-xs text-text-muted mt-2">giamm.ai può sbagliare, ma nel dubbio... non farlo.</p>
           </div>
         </div>
       </template>
@@ -370,16 +350,37 @@ async function sendMessage(text) {
           </div>
         </div>
 
+        <!-- Scroll to bottom button -->
+        <Transition
+          enter-active-class="transition ease-out duration-200"
+          enter-from-class="opacity-0 translate-y-2"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition ease-in duration-150"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 translate-y-2"
+        >
+          <button
+            v-if="showScrollButton"
+            @click="scrollToBottom"
+            class="fixed bottom-28 left-1/2 -translate-x-1/2 w-10 h-10 rounded-full bg-bg-secondary/70 backdrop-blur-xs border border-border flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-tertiary hover:shadow-2xl transition-all cursor-pointer z-40"
+          >
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+            </svg>
+          </button>
+        </Transition>
+
         <!-- Input at bottom -->
-        <div class="border-t border-border bg-bg-primary px-4 py-4 fixed w-full left-0 bottom-0">
-          <div class="container mx-auto">
+        <div class="px-4 fixed w-full left-0 bottom-0">
+          <div class="container mx-auto px-5 pb-4 relative">
             <ChatInput
               v-model:tone="tone"
               @send="sendMessage"
               :disabled="loading || remainingRequests <= 0"
               :placeholder="remainingRequests <= 0 ? 'Limite giornaliero raggiunto' : 'Scrivi un messaggio...'"
             />
-            <p class="text-center text-xs text-text-muted mt-2">giamm.ai può sbagliare, ma nel dubbio... non farlo.</p>
+            <p class="text-center text-xs text-text-muted mt-2 relative z-20">giamm.ai può sbagliare, ma nel dubbio... non farlo.</p>
+            <div class="h-2/3 w-full bg-bg-primary absolute left-0 bottom-0 z-10"></div>
           </div>
         </div>
       </template>

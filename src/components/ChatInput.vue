@@ -32,7 +32,7 @@ function updateTone(val) {
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit" class="relative">
+  <form @submit.prevent="handleSubmit" class="relative z-20">
     <div class="bg-bg-input border border-border rounded-4xl shadow-sm focus-within:ring-2 focus-within:ring-accent/30 focus-within:border-accent transition-all">
       <div class="flex items-end gap-2 p-2">
         <textarea
