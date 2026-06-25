@@ -27,11 +27,21 @@ Abbiamo abbandonato il backend PHP. Sì, proprio così. PHP se n'è andato, come
 - **Vue 3** + `<script setup>` — Perché le opzioni API sono per chi ha ancora speranze nella vita
 - **Tailwind CSS v4** — Compilato, non CDN. Sì, abbiamo sofferto.
 - **Cloudflare Workers** — Il tuo codice gira su 300+ data center nel mondo. Così puoi fallire globalmente, non solo a casa tua
+- **Wrangler** — Il CLI che ti permette di testare il Worker in locale. Sì, serve un altro tool. No, non ti scoraggiamo abbastanza.
 - **Groq API** — Veloce, gratis e altrettanto cinica di noi
 - **IndexedDB + AES-GCM** — Crittografia locale. Nemmeno noi vogliamo sapere che idea disastrosa stavi per realizzare
-- **Docker** — Perché "funziona sulla mia macchina" non è più una scusa valida (ma ormai serve solo per il frontend)
+- **Vite** — Perché aspettare che Webpack compili è come aspettare che tu realizzi un progetto: troppo lento.
 
 > *"Abbiamo spostato tutto su Cloudflare perché i server tradizionali sono lenti. Come te quando hai un'idea."*
+
+---
+
+## Requisiti
+
+- **Node.js** >= 18 (se hai una versione più vecchia, anche i tuoi progetti sono vecchi, figurati)
+- **npm** (o pnpm, se sei quel tipo di persona)
+- Una **GROQ_API_KEY** gratuita da [console.groq.com](https://console.groq.com/)
+- Due terminali aperti (sì, due. Perché uno solo è troppo facile)
 
 ---
 
@@ -44,33 +54,70 @@ git clone https://github.com/madferro/giamm.ai.git
 cd giamm.ai
 ```
 
-### 2. Crea il `.env` (la chiave API, non quella della tua casa)
+### 2. Installa dipendenze Frontend
 
 ```bash
-cp .env.example .env
+npm install
 ```
 
-Modifica `.env`:
+### 3. Installa dipendenze Worker
+
+```bash
+cd worker
+npm install
+```
+
+### 4. Configura la chiave API
+
+```bash
+cp .dev.vars.example .dev.vars
+```
+
+Modifica `worker/.dev.vars`:
 ```env
 GROQ_API_KEY=gsk_la_tua_chiave_qui
 ```
 
 > Ottieni la chiave gratuita su [console.groq.com](https://console.groq.com/)
 
-### 3. Installa (Docker, ovviamente)
+---
+
+## Avvio in Locale (2 terminali, perché siamo complicati)
+
+### Terminal 1 — Avvia il Worker
 
 ```bash
-cd containers/giamm.ai
-docker-compose up -d --build
+cd worker
+npm run dev
 ```
 
-### 4. Apri il browser
-
+Vedrai:
 ```
-http://giamm.ai.docker.test
+⛅️ wrangler 3.x.x
+------------------
+⎔ Starting local server...
+[wrangler:inf] Ready on http://localhost:8787
 ```
 
-Se non hai configurato il dominio locale, usa `http://localhost` (ma ti avviso che funzionerà lo stesso, purtroppo).
+### Terminal 2 — Avvia il Frontend
+
+```bash
+# Dalla root del progetto
+npm run dev
+```
+
+Vedrai:
+```
+VITE v5.x.x  ready in xxx ms
+
+➜  Local:   http://localhost:5173/
+```
+
+### 5. Testa nel browser
+
+Apri **http://localhost:5173** e prova a scrivere qualcosa.
+
+> **Nota:** Il frontend si connette automaticamente al Worker su `localhost:8787` tramite il proxy di Vite. Non devi toccare nulla. A differenza dei tuoi progetti, questa parte funziona da sola.
 
 ---
 
@@ -94,10 +141,58 @@ giamm.ai/
 │   └── style.css           ← Tailwind v4 con @theme
 ├── worker/               ← Cloudflare Worker (il cervello cinico)
 │   ├── src/index.js      ← Gestisce le API e le risposte sarcastiche
-│   └── package.json
-├── containers/           ← Docker setup (per chi ancora ci crede)
-├── volumes/              ← Codice montato nel container
+│   ├── package.json
+│   └── wrangler.toml
+├── vite.config.js        ← Proxy verso il Worker
 └── README.md             ← Tu sei qui. Brutto posto per essere.
+```
+
+---
+
+## Troubleshooting
+
+### Il Worker non si avvia
+
+```bash
+# Verifica che la porta 8787 sia libera
+lsof -i :8787
+
+# Se occupata, uccidi il processo
+kill -9 <PID>
+```
+
+### La chiave API non funziona
+
+```bash
+# Verifica che .dev.vars esista
+ls -la worker/.dev.vars
+
+# Verifica il contenuto (senza mostrare la chiave)
+cat worker/.dev.vars | grep GROQ_API_KEY
+```
+
+### Il Frontend non si connette al Worker
+
+Verifica `vite.config.js`:
+
+```javascript
+proxy: {
+  '/api': {
+    target: 'http://localhost:8787',  // ← Deve puntare al Worker
+    changeOrigin: true,
+  },
+}
+```
+
+### npm install fallisce con ECONNRESET
+
+Se vedi errori di rete durante `npm install`, prova:
+
+```bash
+npm config set maxsockets 1
+npm config set fetch-timeout 60000
+npm cache clean --force
+npm install
 ```
 
 ---
