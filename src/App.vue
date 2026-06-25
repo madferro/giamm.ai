@@ -4,7 +4,9 @@ import WelcomeScreen from './components/WelcomeScreen.vue'
 import ChatMessages from './components/ChatMessages.vue'
 import ChatInput from './components/ChatInput.vue'
 import PrivacyModal from './components/PrivacyModal.vue'
-import { initDB, saveMessage, getRemainingRequests, cleanOldMessages, getTodayMessages } from './utils/db.js'
+import Sidebar from './components/Sidebar.vue'
+import AboutModal from './components/AboutModal.vue'
+import { initDB, saveMessage, getRemainingRequests, cleanOldMessages, getTodayMessages, getMessagesBySession } from './utils/db.js'
 
 const messages = ref([])
 const loading = ref(false)
@@ -15,10 +17,20 @@ const dark = ref(false)
 const tone = ref('ironic')
 const showScrollButton = ref(false)
 const showPrivacy = ref(false)
+const showSidebar = ref(false)
+const showAbout = ref(false)
+const currentChatDate = ref(null)
+const currentSessionId = ref(null)
+const sidebarRef = ref(null)
+const sidebarCollapsed = ref(false)
 
-// Blocca/sblocca scroll quando si apre/chiude il modal privacy
-watch(showPrivacy, (newVal) => {
-  if (newVal) {
+// Blocca/sblocca scroll quando si apre/chiude il modal privacy o about
+watch([showPrivacy, showAbout, showSidebar], ([privacy, about, sidebar]) => {
+  // Su mobile, blocca scroll se sidebar è aperta
+  // Su desktop, blocca scroll solo se un modal è aperto (non per la sidebar)
+  const isMobile = window.innerWidth < 1024
+  
+  if (privacy || about || (sidebar && isMobile)) {
     document.body.style.overflow = 'hidden'
   } else {
     document.body.style.overflow = ''
@@ -28,15 +40,45 @@ watch(showPrivacy, (newVal) => {
 onMounted(async () => {
   await initDB()
   await loadTodayConversations() // Carica conversazioni di oggi
+  // Se non c'è una sessione attiva (nessun messaggio salvato), generane una nuova
+  if (!currentSessionId.value) {
+    currentSessionId.value = generateSessionId()
+  }
+  currentChatDate.value = new Date().toISOString().split('T')[0] // Imposta data corrente
   await checkRateLimit()
   await cleanOldMessages(30) // Pulisci messaggi più vecchi di 30 giorni
   dark.value = document.documentElement.classList.contains('dark')
   window.addEventListener('scroll', onWindowScroll, { passive: true })
+  
+  // Carica preferenza sidebar collapsed da localStorage
+  const savedCollapsed = localStorage.getItem('giammai-sidebar-collapsed')
+  if (savedCollapsed === 'true') {
+    sidebarCollapsed.value = true
+  }
+  
+  // Apri sidebar automaticamente su schermi grandi
+  if (window.innerWidth >= 1024) {
+    showSidebar.value = true
+  }
+  
+  // Gestisci resize per aprire/chiudere sidebar
+  window.addEventListener('resize', handleResize)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', onWindowScroll)
+  window.removeEventListener('resize', handleResize)
 })
+
+function handleResize() {
+  if (window.innerWidth >= 1024) {
+    showSidebar.value = true
+  } else {
+    showSidebar.value = false
+  }
+}
+
+
 
 function scrollToBottom() {
   window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })
@@ -85,10 +127,13 @@ function toggleTheme() {
 async function loadTodayConversations() {
   try {
     const todayMessages = await getTodayMessages()
-    
+
     if (todayMessages.length > 0) {
       hasMessages.value = true
-      
+
+      // Usa la sessionId del primo messaggio come sessione corrente
+      currentSessionId.value = todayMessages[0].sessionId || todayMessages[0].date
+
       // Converte i messaggi da IndexedDB al formato UI
       messages.value = todayMessages.map((msg, index) => ({
         id: Date.now() + index, // ID univoco per Vue
@@ -96,7 +141,7 @@ async function loadTodayConversations() {
         content: msg.content,
         time: msg.time
       }))
-      
+
       // Scroll automatico in fondo dopo aver caricato i messaggi
       await nextTick()
       scrollToBottom()
@@ -104,6 +149,69 @@ async function loadTodayConversations() {
   } catch (e) {
     console.error('Error loading today conversations:', e)
   }
+}
+
+async function loadChatBySession(sessionId) {
+  try {
+    const chatMessages = await getMessagesBySession(sessionId)
+
+    currentSessionId.value = sessionId
+    currentChatDate.value = chatMessages[0]?.date || new Date().toISOString().split('T')[0]
+
+    if (chatMessages.length > 0) {
+      hasMessages.value = true
+
+      // Converte i messaggi da IndexedDB al formato UI
+      messages.value = chatMessages.map((msg, index) => ({
+        id: Date.now() + index,
+        role: msg.type === 'request' ? 'user' : 'assistant',
+        content: msg.content,
+        time: msg.time
+      }))
+
+      // Scroll automatico in fondo dopo aver caricato i messaggi
+      await nextTick()
+      scrollToBottom()
+    } else {
+      // Nessun messaggio per questa sessione
+      messages.value = []
+      hasMessages.value = false
+    }
+  } catch (e) {
+    console.error('Error loading chat by session:', e)
+  }
+}
+
+function generateSessionId() {
+  // Genera un ID univoco: timestamp + random
+  return Date.now().toString(36) + Math.random().toString(36).substring(2, 8)
+}
+
+function startNewChat() {
+  messages.value = []
+  hasMessages.value = false
+  currentSessionId.value = generateSessionId()
+  currentChatDate.value = new Date().toISOString().split('T')[0]
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function toggleSidebar() {
+  showSidebar.value = !showSidebar.value
+  
+  // Ricarica la cronologia quando si apre la sidebar
+  if (showSidebar.value && sidebarRef.value) {
+    nextTick(() => {
+      sidebarRef.value.loadChatHistory()
+    })
+  }
+}
+
+function toggleSidebarCollapse() {
+  sidebarCollapsed.value = !sidebarCollapsed.value
+  // Salva la preferenza in localStorage
+  localStorage.setItem('giammai-sidebar-collapsed', sidebarCollapsed.value ? 'true' : 'false')
 }
 
 async function checkRateLimit() {
@@ -144,13 +252,18 @@ async function sendMessage(text) {
   
   try {
     // Salva la richiesta in IndexedDB (conta per il rate limit)
-    await saveMessage('request', text.trim())
+    await saveMessage('request', text.trim(), currentSessionId.value)
+    
+    // Aggiorna la cronologia nella sidebar (mostra subito la nuova chat)
+    if (sidebarRef.value) {
+      sidebarRef.value.loadChatHistory()
+    }
     
     // Aggiorna il contatore
     await checkRateLimit()
     
-    // Chiama l'API
-    const res = await fetch('/api/chat.php', {
+    // Chiama l'API (Cloudflare Worker)
+    const res = await fetch('/api/chat', {
       method: 'POST', 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: text.trim(), tone: tone.value })
@@ -171,7 +284,12 @@ async function sendMessage(text) {
       scrollToBottom()
       
       // Salva la risposta in IndexedDB (NON conta per il rate limit)
-      await saveMessage('response', data.response)
+      await saveMessage('response', data.response, currentSessionId.value)
+      
+      // Aggiorna la cronologia nella sidebar
+      if (sidebarRef.value) {
+        sidebarRef.value.loadChatHistory()
+      }
     } else {
       error.value = data.error || 'Errore'
       setTimeout(() => error.value = '', 5000)
@@ -187,28 +305,60 @@ async function sendMessage(text) {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-bg-primary text-text-primary">
-    <!-- Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 h-14 backdrop-blur-xl bg-bg-primary/70 transition-colors duration-200">
-      <div class="container mx-auto px-5 h-full flex items-center justify-between">
-        <a href="/" class="flex items-center gap-2 font-bold text-lg tracking-tight text-text-primary">
-          giamm<span class="w-2 h-2 rounded-full bg-accent inline-block"></span>ai
-        </a>
-        <div class="flex items-center gap-2">
+  <div class="min-h-screen flex bg-bg-primary text-text-primary">
+    <!-- Sidebar -->
+    <Sidebar
+      ref="sidebarRef"
+      :is-open="showSidebar"
+      :is-collapsed="sidebarCollapsed"
+      :current-session-id="currentSessionId"
+      @close="showSidebar = false"
+      @load-chat="loadChatBySession"
+      @show-privacy="showPrivacy = true"
+      @show-about="showAbout = true"
+      @new-chat="startNewChat"
+      @toggle-collapse="toggleSidebarCollapse"
+    />
+
+    <!-- Main Content Area -->
+    <div 
+      :class="[
+        'flex-1 flex flex-col transition-all ease-out duration-200',
+        sidebarCollapsed ? 'lg:ml-14' : 'lg:ml-72'
+      ]"
+      :style="{ transitionDelay: sidebarCollapsed ? '200ms' : '0ms' }"
+    >
+      <!-- About Modal -->
+      <AboutModal
+        :show="showAbout"
+        @close="showAbout = false"
+      />
+
+      <!-- Header -->
+      <header 
+        :class="[
+          'fixed top-0 right-0 left-0 z-50 h-14 transition-all ease-out duration-200',
+          sidebarCollapsed ? 'lg:left-14' : 'lg:left-72'
+        ]"
+        :style="{ transitionDelay: sidebarCollapsed ? '200ms' : '0ms' }"
+      >
+        <div class="px-5 h-full flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <!-- Hamburger Menu (solo mobile) -->
+            <button
+              @click="toggleSidebar"
+              class="lg:hidden w-9 h-9 rounded-lg border border-border bg-bg-secondary flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors cursor-pointer"
+              title="Menu"
+            >
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M3 12h18M3 6h18M3 18h18"/>
+              </svg>
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
           <div class="text-xs font-medium text-text-muted bg-bg-secondary px-3 py-1.5 rounded-full border border-border">
             <strong class="text-accent">{{ remainingRequests }}</strong> / 10
           </div>
-          <button
-            type="button"
-            @click="showPrivacy = true"
-            class="w-9 h-9 rounded-lg border border-border bg-bg-secondary flex items-center justify-center text-text-secondary hover:text-accent hover:border-accent/50 transition-colors cursor-pointer"
-            title="Privacy & Sicurezza"
-          >
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-          </button>
           <button @click="toggleTheme" class="w-9 h-9 rounded-lg border border-border bg-bg-secondary flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors cursor-pointer">
             <svg v-if="dark" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
             <svg v-else width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -239,14 +389,10 @@ async function sendMessage(text) {
       leave-from-class="translate-x-0"
       leave-to-class="translate-x-full"
     >
-      <div v-if="showPrivacy" class="fixed top-0 right-0 bottom-0 z-[70] w-full max-w-md bg-bg-primary border-l border-border shadow-2xl flex flex-col">
+      <div v-if="showPrivacy" class="fixed top-0 right-0 bottom-0 z-[70] w-full max-w-2xl bg-bg-primary border-l border-border shadow-2xl flex flex-col">
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-5 border-b border-border">
-          <h2 class="text-xl font-semibold text-text-primary flex items-center gap-2">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" class="text-accent">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
+          <h2 class="text-lg font-bold text-text-primary flex items-center gap-2">
             Privacy & Sicurezza
           </h2>
           <button
@@ -310,7 +456,7 @@ async function sendMessage(text) {
           <button
             type="button"
             @click="showPrivacy = false"
-            class="w-full px-4 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-colors cursor-pointer"
+            class="cursor-pointer w-full px-4 py-2.5 rounded-lg bg-accent text-white text-sm font-medium hover:bg-accent-hover transition-colors cursor-pointer"
           >
             Ooook ho capito
           </button>
@@ -371,8 +517,14 @@ async function sendMessage(text) {
         </Transition>
 
         <!-- Input at bottom -->
-        <div class="px-4 fixed w-full left-0 bottom-0">
-          <div class="container mx-auto px-5 pb-4 relative">
+        <div 
+          :class="[
+            'px-4 fixed w-full right-0 bottom-0 transition-all ease-out duration-200',
+            sidebarCollapsed ? 'lg:left-14 lg:w-[calc(100%-3.5rem)]' : 'lg:left-72 lg:w-[calc(100%-18rem)]'
+          ]"
+          :style="{ transitionDelay: sidebarCollapsed ? '200ms' : '0ms' }"
+        >
+          <div class="container mx-auto px-0 lg:px-5 pb-4 relative">
             <ChatInput
               v-model:tone="tone"
               @send="sendMessage"
@@ -389,5 +541,8 @@ async function sendMessage(text) {
 
     <!-- Privacy Modal Sbarrante -->
     <PrivacyModal @accept="() => {}" />
+    
+    </div>
+    <!-- Fine Main Content Area -->
   </div>
 </template>
