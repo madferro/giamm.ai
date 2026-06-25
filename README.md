@@ -22,12 +22,16 @@ Perfetto, vero?
 
 ## Stack Tecnologico (perché non poteva essere più semplice?)
 
+Abbiamo abbandonato il backend PHP. Sì, proprio così. PHP se n'è andato, come i tuoi sogni di gloria.
+
 - **Vue 3** + `<script setup>` — Perché le opzioni API sono per chi ha ancora speranze nella vita
 - **Tailwind CSS v4** — Compilato, non CDN. Sì, abbiamo sofferto.
-- **PHP 8.2** — Perché PHP non è morto, è solo... scoraggiato.
+- **Cloudflare Workers** — Il tuo codice gira su 300+ data center nel mondo. Così puoi fallire globalmente, non solo a casa tua
 - **Groq API** — Veloce, gratis e altrettanto cinica di noi
-- **Docker** — Perché "funziona sulla mia macchina" non è più una scusa valida
-- **MySQL** — Per tenere traccia di quante volte ti sei fatto male
+- **IndexedDB + AES-GCM** — Crittografia locale. Nemmeno noi vogliamo sapere che idea disastrosa stavi per realizzare
+- **Docker** — Perché "funziona sulla mia macchina" non è più una scusa valida (ma ormai serve solo per il frontend)
+
+> *"Abbiamo spostato tutto su Cloudflare perché i server tradizionali sono lenti. Come te quando hai un'idea."*
 
 ---
 
@@ -80,12 +84,20 @@ giamm.ai/
 │   │   ├── WelcomeScreen.vue
 │   │   ├── ChatMessages.vue
 │   │   ├── ChatMessage.vue
-│   │   └── ChatInput.vue
-│   └── style.css        ← Tailwind v4 con @theme
-├── public/api/           ← PHP backend (scoraggiante anche lui)
-├── containers/           ← Docker setup
-├── volumes/            ← Codice montato nel container
-└── README.md           ← Tu sei qui. Brutto posto per essere.
+│   │   ├── ChatInput.vue
+│   │   ├── Sidebar.vue     ← La cronologia delle tue debacle
+│   │   ├── PrivacyModal.vue
+│   │   └── AboutModal.vue  ← Dove spieghiamo perché esistiamo
+│   ├── utils/
+│   │   ├── db.js           ← IndexedDB per la cronologia (criptata!)
+│   │   └── crypto.js       ← AES-GCM, perché la vergogna va protetta
+│   └── style.css           ← Tailwind v4 con @theme
+├── worker/               ← Cloudflare Worker (il cervello cinico)
+│   ├── src/index.js      ← Gestisce le API e le risposte sarcastiche
+│   └── package.json
+├── containers/           ← Docker setup (per chi ancora ci crede)
+├── volumes/              ← Codice montato nel container
+└── README.md             ← Tu sei qui. Brutto posto per essere.
 ```
 
 ---
@@ -94,6 +106,7 @@ giamm.ai/
 
 - **10 richieste al giorno per IP** — Perché l'AI deve riposare tra uno scoraggiamento e l'altro
 - La tua autostima potrebbe risentirne. Non è un bug, è una feature.
+- Il codice gira su Cloudflare Workers, quindi è veloce. Purtroppo anche le tue delusioni saranno distribuite globalmente con latenza < 50ms.
 
 ---
 
@@ -117,4 +130,4 @@ MIT — Fai quello che vuoi. Ma ricorda: ogni modifica che farai avrà conseguen
 
 ---
 
-Fatto con ironia (e un po' di Vue) in Italia 🇮🇹
+Fatto con ironia (e un po' di Vue + Cloudflare) in Italia 🇮🇹
