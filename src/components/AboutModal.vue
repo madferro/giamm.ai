@@ -61,15 +61,15 @@ const emit = defineEmits(['close'])
             <strong class="text-accent">giamm.ai</strong> è l'unico assistente AI che, invece di dirti "puoi farcela!", ti risponde "ma sei sicuro? Perché sembra una pessima idea".
           </p>
           <p class="">
-            Pensa a quel amico cinico che smonta ogni tuo progetto prima ancora che tu apra il laptop. Quello che, quando gli dici "voglio aprire un ristorante", ti chiede se hai mai bruciato un toast senza farlo apposta. Esatto, quello lì. Solo che è un bot, lavora 24/7 e non ti deve una birra.
+            Pensa a quell'amico cinico che smonta ogni tuo progetto prima ancora che tu apra il laptop. Quello che, quando gli dici "voglio aprire un ristorante", ti chiede se hai mai bruciato un toast senza farlo apposta. Esatto, quello lì. Solo che è un bot, lavora 24/7 e non ti deve una birra.
           </p>
         </div>
 
         <!-- Filosofia -->
         <div class="space-y-4">
-          <h3 class="text-lg text-accent font-bold flex items-center gap-2">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+          <h3 class="text-lg text-accent font-semibold flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
             La nostra (malinconica) filosofia
           </h3>
@@ -82,9 +82,9 @@ const emit = defineEmits(['close'])
                 </svg>
               </div>
               <div>
-                <h4 class="font-semibold text-text-primary mb-1">Demotivazione Istantanea</h4>
+                <h4 class="font-semibold text-text-primary mb-1">Demotivazione istantanea</h4>
                 <p class="text-sm text-text-secondary">
-                  Perché incoraggiarti quando possiamo farti risparmiare mesi di sofferenza? Ti smentiamo subito, così non devi nemmeno iniziare.
+                  Perché incoraggiarti quando possiamo farti risparmiare mesi di sofferenza? Ti smontiamo subito, così non devi nemmeno iniziare.
                 </p>
               </div>
             </div>
@@ -96,9 +96,9 @@ const emit = defineEmits(['close'])
                 </svg>
               </div>
               <div>
-                <h4 class="font-semibold text-text-primary mb-1">Risposte Veloci come il Tuo Fallimento</h4>
+                <h4 class="font-semibold text-text-primary mb-1">Risposte veloci come il tuo fallimento</h4>
                 <p class="text-sm text-text-secondary">
-                  Alimentato da Groq AI e Cloudflare Workers per demolire i tuoi sogni a velocità supersonica. Zero latenza, massima delusione.
+                  Alimentato da Groq AI e Cloudflare per demolire i tuoi sogni a velocità supersonica. Zero latenza, massima delusione.
                 </p>
               </div>
             </div>
@@ -111,7 +111,7 @@ const emit = defineEmits(['close'])
                 </svg>
               </div>
               <div>
-                <h4 class="font-semibold text-text-primary mb-1">Privacy Irrisoria</h4>
+                <h4 class="font-semibold text-text-primary mb-1">Privacy irrisoria</h4>
                 <p class="text-sm text-text-secondary">
                   Tutto rimane nel tuo browser. Nemmeno noi vogliamo sapere che idea disastrosa stavi per realizzare.
                 </p>
@@ -120,12 +120,13 @@ const emit = defineEmits(['close'])
 
             <div class="flex gap-3 p-4 rounded-lg bg-bg-secondary border border-border">
               <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center text-accent">
-                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
                 </svg>
+
               </div>
               <div>
-                <h4 class="font-semibold text-text-primary mb-1">Cronologia delle tue Debacle</h4>
+                <h4 class="font-semibold text-text-primary mb-1">Cronologia delle tue debacle</h4>
                 <p class="text-sm text-text-secondary">
                   Salva ogni conversazione per ricordarti, quando sarai tentato di riprovare, quanto male è andata l'ultima volta.
                 </p>
@@ -137,9 +138,10 @@ const emit = defineEmits(['close'])
         <!-- Per chi è -->
         <div class="space-y-4">
           <h3 class="text-lg font-bold text-accent flex items-center gap-2">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
             </svg>
+
             Per chi è giamm.ai
           </h3>
           
@@ -160,7 +162,7 @@ const emit = defineEmits(['close'])
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="mt-1 size-4 flex-shrink-0">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
-              <span class="text-text-primary">Per chi cerca un "sì, puoi farcela!" e invece trova un "perché proprio tu?".</span>
+              <span class="text-text-primary">Per chi cerca un "sì, puoi farcela!" e invece trova un "e se poi te ne penti?".</span>
             </li>
             <li class="flex items-start gap-2 text-accent text-sm">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="mt-1 size-4 flex-shrink-0">
@@ -174,29 +176,32 @@ const emit = defineEmits(['close'])
         <!-- Disclaimer -->
         <div class="p-4 rounded-lg bg-accent/5 border border-accent/20">
           <h4 class="font-semibold text-accent mb-2 flex items-center gap-2">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
             </svg>
+
             Disclaimer Legale
           </h4>
           <p class="text-sm text-text-secondary leading-relaxed">
-            giamm.ai non è responsabile se, nonostante i nostri sforzi per dissuaderti, decidi comunque di farlo. Se apri quel ristorante, se lanci quella startup, se scrivi quel romanzo... e fallisci, non dirci che non ti avevamo avvertito. <em>Perché lo abbiamo fatto. Più volte. In dettaglio.</em>
+            giamm.ai non è responsabile se, nonostante i nostri sforzi per dissuaderti, decidi comunque di farlo. Se apri quel ristorante, se lanci quella startup, se scrivi quel romanzo... e fallisci, non dirci che non ti avevamo avvertito. <em><strong>Perché lo abbiamo fatto. Più volte. In dettaglio.</strong></em>
           </p>
         </div>
 
         <!-- Tech Stack -->
         <div class="space-y-4">
           <h3 class="text-lg font-bold text-accent flex items-center gap-2">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
             </svg>
+
+
             Tecnologia che funziona (a differenza tua)
           </h3>
           
           <div class="grid grid-cols-2 gap-3">
             <div class="p-3 rounded-lg bg-bg-secondary border border-border text-center">
               <div class="font-semibold text-text-primary">Cloudflare</div>
-              <div class="text-xs text-text-muted mt-1">Perché i tuoi fallimenti devono essere veloci</div>
+              <div class="text-xs text-text-muted mt-1">Perché i tuoi fallimenti devono essere protetti</div>
             </div>
             <div class="p-3 rounded-lg bg-bg-secondary border border-border text-center">
               <div class="font-semibold text-text-primary">Groq AI</div>

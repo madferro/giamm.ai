@@ -2,8 +2,9 @@
 import { encrypt, decrypt } from './crypto.js'
 
 const DB_NAME = 'giammai_db'
-const DB_VERSION = 2
+const DB_VERSION = 3
 const STORE_MESSAGES = 'messages'
+const STORE_RATE_LIMIT = 'rate_limit'
 
 let db = null
 
@@ -36,7 +37,7 @@ export async function initDB() {
         store.createIndex('timestamp', 'timestamp', { unique: false })
         store.createIndex('sessionId', 'sessionId', { unique: false })
       } else {
-        // Upgrade da v1 a v2: aggiungi indice sessionId
+        // Upgrade: aggiungi indice sessionId se mancante
         const store = event.target.transaction.objectStore(STORE_MESSAGES)
         if (!store.indexNames.contains('sessionId')) {
           store.createIndex('sessionId', 'sessionId', { unique: false })
@@ -56,6 +57,11 @@ export async function initDB() {
           }
         }
       }
+
+      // Store per rate limit (separato dalla cronologia)
+      if (!db.objectStoreNames.contains(STORE_RATE_LIMIT)) {
+        db.createObjectStore(STORE_RATE_LIMIT, { keyPath: 'date' })
+      }
     }
   })
 }
@@ -70,8 +76,8 @@ export async function saveMessage(type, content, sessionId) {
   const encryptedContent = await encrypt(content)
 
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction([STORE_MESSAGES], 'readwrite')
-    const store = transaction.objectStore(STORE_MESSAGES)
+    const transaction = db.transaction([STORE_MESSAGES, STORE_RATE_LIMIT], 'readwrite')
+    const msgStore = transaction.objectStore(STORE_MESSAGES)
 
     const message = {
       type, // 'request' o 'response'
@@ -82,28 +88,41 @@ export async function saveMessage(type, content, sessionId) {
       sessionId: sessionId || today
     }
 
-    const request = store.add(message)
+    const request = msgStore.add(message)
 
-    request.onsuccess = () => resolve(request.result)
+    request.onsuccess = () => {
+      // Se è una richiesta, incrementa il contatore rate limit (separato dalla cronologia)
+      if (type === 'request') {
+        const rateStore = transaction.objectStore(STORE_RATE_LIMIT)
+        const rateRequest = rateStore.get(today)
+        rateRequest.onsuccess = () => {
+          const existing = rateRequest.result
+          if (existing) {
+            existing.count = (existing.count || 0) + 1
+            rateStore.put(existing)
+          } else {
+            rateStore.put({ date: today, count: 1 })
+          }
+        }
+      }
+      resolve(request.result)
+    }
     request.onerror = () => reject(request.error)
   })
 }
 
-// Conta le richieste (solo type='request') fatte oggi
+// Conta le richieste fatte oggi dal store rate_limit (separato dalla cronologia)
 export async function countTodayRequests() {
   const db = await initDB()
   const today = new Date().toISOString().split('T')[0]
 
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction([STORE_MESSAGES], 'readonly')
-    const store = transaction.objectStore(STORE_MESSAGES)
-    const index = store.index('date')
-    const request = index.getAll(today)
+    const transaction = db.transaction([STORE_RATE_LIMIT], 'readonly')
+    const store = transaction.objectStore(STORE_RATE_LIMIT)
+    const request = store.get(today)
 
     request.onsuccess = () => {
-      // Conta solo le richieste (non le risposte)
-      const requests = request.result.filter(msg => msg.type === 'request')
-      resolve(requests.length)
+      resolve(request.result?.count || 0)
     }
     request.onerror = () => reject(request.error)
   })
@@ -365,6 +384,47 @@ export async function getSessionPreview(sessionId) {
         resolve(null)
       }
     }
+    request.onerror = () => reject(request.error)
+  })
+}
+
+// Cancella tutti i messaggi di una sessione specifica
+export async function deleteSession(sessionId) {
+  const db = await initDB()
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_MESSAGES], 'readwrite')
+    const store = transaction.objectStore(STORE_MESSAGES)
+    const index = store.index('sessionId')
+    const request = index.openCursor(sessionId)
+
+    let deletedCount = 0
+
+    request.onsuccess = (event) => {
+      const cursor = event.target.result
+      if (cursor) {
+        cursor.delete()
+        deletedCount++
+        cursor.continue()
+      } else {
+        resolve(deletedCount)
+      }
+    }
+
+    request.onerror = () => reject(request.error)
+  })
+}
+
+// Cancella TUTTE le sessioni (ma NON il rate limit!)
+export async function deleteAllSessions() {
+  const db = await initDB()
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([STORE_MESSAGES], 'readwrite')
+    const store = transaction.objectStore(STORE_MESSAGES)
+    const request = store.clear()
+
+    request.onsuccess = () => resolve(request.result)
     request.onerror = () => reject(request.error)
   })
 }

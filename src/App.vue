@@ -6,7 +6,8 @@ import ChatInput from './components/ChatInput.vue'
 import PrivacyModal from './components/PrivacyModal.vue'
 import Sidebar from './components/Sidebar.vue'
 import AboutModal from './components/AboutModal.vue'
-import { initDB, saveMessage, getRemainingRequests, cleanOldMessages, getTodayMessages, getMessagesBySession } from './utils/db.js'
+import { initDB, saveMessage, getRemainingRequests, cleanOldMessages, getTodayMessages, getMessagesBySession, deleteSession, deleteAllSessions } from './utils/db.js'
+import ConfirmDialog from './components/ConfirmDialog.vue'
 
 const messages = ref([])
 const loading = ref(false)
@@ -23,6 +24,7 @@ const currentChatDate = ref(null)
 const currentSessionId = ref(null)
 const sidebarRef = ref(null)
 const sidebarCollapsed = ref(false)
+const confirmDialog = ref(null)
 
 // Blocca/sblocca scroll quando si apre/chiude il modal privacy o about
 watch([showPrivacy, showAbout, showSidebar], ([privacy, about, sidebar]) => {
@@ -187,6 +189,45 @@ function generateSessionId() {
   return Date.now().toString(36) + Math.random().toString(36).substring(2, 8)
 }
 
+function handleChatDeleted(deletedSessionId) {
+  // Se la chat cancellata è quella corrente, svuota la UI
+  if (deletedSessionId === currentSessionId.value) {
+    messages.value = []
+    hasMessages.value = false
+    currentSessionId.value = generateSessionId()
+    currentChatDate.value = new Date().toISOString().split('T')[0]
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+function handleAllChatsDeleted() {
+  // Svuota la UI e genera una nuova sessione
+  messages.value = []
+  hasMessages.value = false
+  currentSessionId.value = generateSessionId()
+  currentChatDate.value = new Date().toISOString().split('T')[0]
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+async function handleDeleteCurrentChat() {
+  if (!currentSessionId.value) return
+  const confirmed = await confirmDialog.value.open({
+    title: 'Cancella chat',
+    message: 'Sicuro di voler cancellare questa chat? Le domande fatte oggi rimarranno conteggiate.',
+    confirmText: 'Cancella',
+    cancelText: 'Annulla',
+    dangerous: true
+  })
+  if (!confirmed) return
+  await deleteSession(currentSessionId.value)
+  messages.value = []
+  hasMessages.value = false
+  currentSessionId.value = generateSessionId()
+  currentChatDate.value = new Date().toISOString().split('T')[0]
+  if (sidebarRef.value) sidebarRef.value.loadChatHistory()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 function startNewChat() {
   messages.value = []
   hasMessages.value = false
@@ -318,6 +359,8 @@ async function sendMessage(text) {
       @show-about="showAbout = true"
       @new-chat="startNewChat"
       @toggle-collapse="toggleSidebarCollapse"
+      @chat-deleted="handleChatDeleted"
+      @all-chats-deleted="handleAllChatsDeleted"
     />
 
     <!-- Main Content Area -->
@@ -333,6 +376,9 @@ async function sendMessage(text) {
         :show="showAbout"
         @close="showAbout = false"
       />
+
+      <!-- Confirm Dialog -->
+      <ConfirmDialog ref="confirmDialog" />
 
       <!-- Header -->
       <header 
@@ -356,6 +402,22 @@ async function sendMessage(text) {
             </button>
           </div>
           <div class="flex items-center gap-2">
+          <!-- Pulsante Cancella Chat (visibile solo se ci sono messaggi) -->
+          <button
+            v-if="hasMessages"
+            @click="handleDeleteCurrentChat"
+            class="py-1.5 tracking-tight px-3 gap-1 text-sm rounded-lg border border-border bg-bg-secondary flex items-center justify-center text-text-secondary hover:text-red-400 hover:bg-red-400/10 transition-colors cursor-pointer"
+            title="Cancella questa chat"
+          >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-4">
+            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+          </svg>
+
+
+
+            
+            Elimina
+          </button>
           <div class="text-xs font-medium text-text-muted bg-bg-secondary px-3 py-1.5 rounded-full border border-border">
             <strong class="text-accent">{{ remainingRequests }}</strong> / 10
           </div>

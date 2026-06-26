@@ -40,6 +40,24 @@ const acceptPrivacy = () => {
   showModal.value = false
   emit('accept')
 }
+
+const rejectPrivacy = () => {
+  // Prova a chiudere il tab (funziona solo se aperto via script)
+  window.close()
+  // Se non è riuscito (tab aperto manualmente), svuota la pagina
+  document.body.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;background:#0a0a0f;color:#e2e8f0;text-align:center;padding:2rem;">
+      <div>
+        <h1 style="font-size:1.5rem;margin-bottom:1rem;color:#f59e0b;">Accesso negato</h1>
+        <p style="margin-bottom:1.5rem;max-width:400px;line-height:1.6;">
+          Hai scelto di non accettare l'informativa privacy. Per utilizzare giamm.ai è necessario accettare il trattamento dei dati.
+        </p>
+        <p style="font-size:0.875rem;color:#94a3b8;">Chiudi questa scheda o ricarica la pagina per continuare.</p>
+      </div>
+    </div>
+  `
+  document.title = 'Accesso negato - giamm.ai'
+}
 </script>
 
 <template>
@@ -48,7 +66,7 @@ const acceptPrivacy = () => {
     v-if="showModal" 
     class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
   >
-    <div class="bg-bg-primary border border-border-strong rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col">
+    <div class="bg-bg-primary overflow-hidden border border-border-strong rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col">
       <!-- Header -->
       <div class="px-6 py-5 border-b border-border">
         <div class="flex items-center gap-3">
@@ -68,7 +86,7 @@ const acceptPrivacy = () => {
         @scroll="handleScroll"
         class="flex-1 overflow-y-auto px-6 py-4 text-sm text-text-primary space-y-4"
       >
-        <p class="text-xs text-text-muted"><strong>Ultimo aggiornamento:</strong> Gennaio 2025</p>
+        <p class="text-xs text-text-muted"><strong>Ultimo aggiornamento:</strong> Giugno 2026</p>
 
         <section>
           <h3 class="font-semibold text-base mb-2">Chi siamo</h3>
@@ -118,24 +136,26 @@ const acceptPrivacy = () => {
           <p class="text-text-secondary mb-2">
             L'utilizzo del servizio comporta pertanto la comunicazione dei messaggi inseriti dall'utente a tale fornitore.
           </p>
+          <p class="text-text-secondary mb-2">
+            Inoltre, l'applicazione è distribuita tramite <strong>Cloudflare, Inc.</strong>, che gestisce l'infrastruttura di rete per garantire velocità e sicurezza. Cloudflare può utilizzare cookie tecnici necessari alla protezione del servizio e alla sua corretta erogazione.
+          </p>
           <p class="text-text-secondary">
-            Per maggiori informazioni si invita a consultare la documentazione privacy disponibile sul sito del fornitore.
+            Per maggiori informazioni consulta le privacy policy dei rispettivi fornitori:
+            <a href="https://groq.com/privacy" target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">Groq Privacy Policy</a> e
+            <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer" class="text-accent hover:underline">Cloudflare Privacy Policy</a>.
           </p>
         </section>
 
         <section>
-          <h3 class="font-semibold text-base mb-2">Dati tecnici e log</h3>
+          <h3 class="font-semibold text-base mb-2">Dati tecnici</h3>
           <p class="text-text-secondary mb-2">
-            Come qualsiasi sito web, il server può registrare automaticamente alcuni dati tecnici necessari al funzionamento e alla sicurezza del servizio, quali:
+            giamm.ai non raccoglie né conserva indirizzi IP o altri dati identificativi degli utenti. L'applicazione è distribuita tramite Cloudflare Workers, un'infrastruttura serverless che gestisce le richieste senza che il nostro codice abbia accesso a log di sistema contenenti dati personali.
           </p>
-          <ul class="list-disc list-inside text-text-secondary space-y-1">
-            <li>indirizzo IP;</li>
-            <li>data e ora della richiesta;</li>
-            <li>informazioni sul browser utilizzato;</li>
-            <li>dati tecnici relativi alla connessione.</li>
-          </ul>
-          <p class="text-text-secondary mt-2">
-            Tali dati vengono utilizzati esclusivamente per finalità tecniche e di sicurezza.
+          <p class="text-text-secondary mb-2">
+            Il solo dato "tecnico" che tocchiamo è il testo che scrivi nella chat, e solo per il tempo necessario a inoltrarlo a Groq e ricevere la risposta. Poi dimentichiamo tutto, come fai tu con i buoni propositi di gennaio.
+          </p>
+          <p class="text-text-secondary">
+            Cloudflare, in qualità di provider di infrastruttura, potrebbe gestire dati tecnici necessari alla sicurezza della rete in conformità con la propria privacy policy.
           </p>
         </section>
 
@@ -144,8 +164,11 @@ const acceptPrivacy = () => {
           <p class="text-text-secondary mb-2">
             giamm.ai non utilizza cookie di profilazione né strumenti pubblicitari.
           </p>
+          <p class="text-text-secondary mb-2">
+            Cloudflare può utilizzare cookie tecnici (ad esempio <code>__cf_bm</code>, <code>__cflb</code>) esclusivamente per finalità di sicurezza della rete, mitigazione degli attacchi DDoS e bilanciamento del carico. Questi cookie sono necessari al funzionamento dell'infrastruttura e non contengono informazioni personali identificative.
+          </p>
           <p class="text-text-secondary">
-            Eventuali tecnologie di memorizzazione locale del browser sono utilizzate esclusivamente per il funzionamento del servizio e per mantenere lo storico delle conversazioni sul dispositivo dell'utente.
+            Eventuali tecnologie di memorizzazione locale del browser (come IndexedDB) sono utilizzate esclusivamente per mantenere lo storico delle conversazioni sul dispositivo dell'utente.
           </p>
         </section>
 
@@ -193,18 +216,27 @@ const acceptPrivacy = () => {
           <span>Scorri fino in fondo per accettare</span>
         </div>
 
-        <button
-          @click="acceptPrivacy"
-          :disabled="!hasScrolledToBottom"
-          :class="[
-            'w-full py-3 px-4 rounded-lg font-medium transition-all',
-            hasScrolledToBottom
-              ? 'bg-accent hover:bg-accent-hover text-white cursor-pointer'
-              : 'bg-bg-tertiary text-text-muted cursor-not-allowed opacity-50'
-          ]"
-        >
-          {{ hasScrolledToBottom ? 'Accetto l\'informativa privacy' : 'Leggi l\'informativa completa' }}
-        </button>
+        <div class="grid grid-cols-2 gap-3">
+          <button
+            @click="rejectPrivacy"
+            class="py-3 px-4 rounded-lg font-medium border border-border text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-all cursor-pointer"
+          >
+            Rifiuta e chiudi
+          </button>
+
+          <button
+            @click="acceptPrivacy"
+            :disabled="!hasScrolledToBottom"
+            :class="[
+              'py-3 px-4 rounded-lg font-medium transition-all',
+              hasScrolledToBottom
+                ? 'bg-accent hover:bg-accent-hover text-white cursor-pointer'
+                : 'bg-bg-tertiary text-text-muted cursor-not-allowed opacity-50'
+            ]"
+          >
+            {{ hasScrolledToBottom ? 'Accetto' : 'Leggi tutto' }}
+          </button>
+        </div>
 
         <p class="text-xs text-text-muted text-center mt-3">
           Continuando accetti il trattamento dei dati come descritto sopra

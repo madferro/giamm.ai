@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { getChatSessions, getSessionPreview } from '../utils/db.js'
+import { getChatSessions, getSessionPreview, deleteSession, deleteAllSessions } from '../utils/db.js'
+import ConfirmDialog from './ConfirmDialog.vue'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -8,10 +9,11 @@ const props = defineProps({
   isCollapsed: Boolean
 })
 
-const emit = defineEmits(['close', 'loadChat', 'showPrivacy', 'showAbout', 'newChat', 'toggleCollapse'])
+const emit = defineEmits(['close', 'loadChat', 'showPrivacy', 'showAbout', 'newChat', 'toggleCollapse', 'chatDeleted', 'allChatsDeleted'])
 
 const chatHistory = ref([])
 const loading = ref(true)
+const confirmDialog = ref(null)
 
 onMounted(async () => {
   await loadChatHistory()
@@ -49,6 +51,35 @@ function formatDate(dateStr) {
 function selectChat(sessionId) {
   emit('loadChat', sessionId)
   if (window.innerWidth < 1024) emit('close')
+}
+
+async function handleDeleteChat(sessionId, event) {
+  event.stopPropagation()
+  const confirmed = await confirmDialog.value.open({
+    title: 'Cancella chat',
+    message: 'Sicuro di voler cancellare questa chat? Le domande fatte oggi rimarranno conteggiate.',
+    confirmText: 'Cancella',
+    cancelText: 'Annulla',
+    dangerous: true
+  })
+  if (!confirmed) return
+  await deleteSession(sessionId)
+  await loadChatHistory()
+  emit('chatDeleted', sessionId)
+}
+
+async function handleDeleteAllChats() {
+  const confirmed = await confirmDialog.value.open({
+    title: 'Cancella tutto',
+    message: 'Sicuro di voler cancellare TUTTE le chat? Questa azione non può essere annullata. Le domande fatte oggi rimarranno conteggiate.',
+    confirmText: 'Cancella tutto',
+    cancelText: 'Annulla',
+    dangerous: true
+  })
+  if (!confirmed) return
+  await deleteAllSessions()
+  await loadChatHistory()
+  emit('allChatsDeleted')
 }
 
 function handleNewChat() {
@@ -104,14 +135,14 @@ defineExpose({ loadChatHistory })
         <button @click="$emit('toggleCollapse')"
           class="hidden lg:flex w-8 h-8 rounded-lg items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors cursor-pointer shrink-0"
           :title="isCollapsed ? 'Espandi menu' : 'Riduci menu'">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path v-if="isCollapsed" d="M9 18l6-6-6-6" />
-            <path v-else d="M15 18l-6-6 6-6" />
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" :class="{ 'transform rotate-180 duration-200': isCollapsed }">
+            <path stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+            <!--<path v-else stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />-->
           </svg>
         </button>
 
         <button @click="$emit('close')"
-          class="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
+          class="lg:hidden w-8 h-6 rounded-lg flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors"
           title="Chiudi">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path d="M18 6L6 18M6 6l12 12" />
@@ -124,18 +155,18 @@ defineExpose({ loadChatHistory })
         <button @click="handleNewChat"
           class="w-full rounded-lg hover:bg-bg-tertiary flex items-center text-text-primary cursor-pointer transition-colors px-2 py-1"
           :title="isCollapsed ? 'Nuova Chat' : ''">
-          <div class="w-8 h-8 flex justify-center items-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-              stroke="currentColor" class="size-4 shrink-0">
+          <div class="w-8 h-6 flex justify-center items-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-[18px] h-[18px] shrink-0">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M12 20.25c4.97 0 9-3.694 9-8.25s-4.03-8.25-9-8.25S3 7.444 3 12c0 2.104.859 4.023 2.273 5.48.432.447.74 1.04.586 1.641a4.483 4.483 0 0 1-.923 1.785A5.969 5.969 0 0 0 6 21c1.282 0 2.47-.402 3.445-1.087.81.22 1.668.337 2.555.337Z" />
             </svg>
           </div>
           <!-- Testo con max-width animato -->
-          <div class="overflow-hidden transition-all ease-out duration-200"
+          <div class="overflow-hidden transition-all ease-out duration-200 flex items-center text-xs font-semibold h-6 whitespace-nowrap"
             :class="isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[140px] opacity-100'"
             :style="{ transitionDelay: isCollapsed ? '0ms' : '200ms' }">
-            <span class="whitespace-nowrap text-xs font-semibold">Nuova Chat</span>
+            Nuova Chat
           </div>
         </button>
       </div>
@@ -151,27 +182,52 @@ defineExpose({ loadChatHistory })
       >
         <div v-show="!isCollapsed" class="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
           <div class="px-3 pt-2">
-            <h3 class="text-xs font-semibold text-text-muted uppercase mb-2 px-2">Le tue chat</h3>
-
             <div v-if="loading" class="text-center py-8 text-text-muted text-sm">Caricamento...</div>
 
-            <div v-else-if="chatHistory.length === 0" class="text-center py-8 text-text-muted text-sm">Nessuna chat
-              salvata</div>
+            <div v-else-if="chatHistory.length === 0" class="px-2 text-text-muted text-xs">Nessuna chat salvata. Inizia chiedendo qualcosa a giamm.ai nella schermata principale. Devo proprio spiegarti tutto...</div>
 
-            <div v-else class="space-y-1">
-              <button v-for="chat in chatHistory" :key="chat.sessionId" @click="selectChat(chat.sessionId)" :class="[
-                'w-full text-left px-3 py-2.5 rounded-lg transition-all group cursor-pointer border border-transparent',
-                currentSessionId === chat.sessionId
-                  ? 'bg-accent/10 text-accent border border-accent/20'
-                  : 'hover:bg-bg-tertiary text-text-primary',
-              ]">
-                <div class="flex items-start justify-between gap-2 mb-1">
-                  <span class="text-xs font-medium">{{ formatDate(chat.date) }}</span>
-                  <span class="text-xs text-text-muted">{{ chat.messageCount }} msg</span>
+            <div v-else>
+              <!-- Header con pulsante Cancella Tutto -->
+              <div class="flex items-center justify-between mb-2 px-2">
+                <h3 class="text-xs font-semibold text-text-muted uppercase">Le tue chat</h3>
+                <button
+                  @click="handleDeleteAllChats"
+                  class="text-text-muted hover:text-red-400 transition-colors cursor-pointer"
+                  title="Cancella tutte le chat"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                  </svg>
+                </button>
+              </div>
+
+              <div class="space-y-1">
+                <div v-for="chat in chatHistory" :key="chat.sessionId" class="relative group">
+                  <button @click="selectChat(chat.sessionId)" :class="[
+                    'w-full text-left px-3 py-2.5 rounded-lg transition-all cursor-pointer border border-transparent',
+                    currentSessionId === chat.sessionId
+                      ? 'bg-accent/10 text-accent border border-accent/20'
+                      : 'hover:bg-bg-tertiary text-text-primary',
+                  ]">
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                      <span class="text-xs font-medium">{{ formatDate(chat.date) }}</span>
+                      <span class="text-xs text-text-muted">{{ chat.messageCount }} msg</span>
+                    </div>
+                    <p class="text-sm text-text-secondary line-clamp-2 transition-colors pr-8">
+                      {{ chat.preview }}</p>
+                  </button>
+                  <!-- Pulsante cancella singola chat -->
+                  <button
+                    @click="handleDeleteChat(chat.sessionId, $event)"
+                    class="absolute right-1.5 bottom-1 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-md text-text-muted hover:text-red-400 hover:bg-red-400/10 cursor-pointer"
+                    title="Cancella chat"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-3.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                  </button>
                 </div>
-                <p class="text-sm text-text-secondary line-clamp-2 group-hover:text-text-primary transition-colors">
-                  {{ chat.preview }}</p>
-              </button>
+              </div>
             </div>
           </div>
         </div>
@@ -185,41 +241,44 @@ defineExpose({ loadChatHistory })
         <button @click="handleShowAbout"
           class="w-full rounded-lg hover:bg-bg-tertiary flex items-center text-text-primary cursor-pointer transition-colors px-2 py-1"
           :title="isCollapsed ? 'Cos\'è giamm.ai' : ''">
-          <div class="w-8 h-8 flex justify-center items-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-              stroke="currentColor" class="size-4 shrink-0">
+          <div class="w-8 h-6 flex justify-center items-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-[18px] h-[18px] shrink-0">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
             </svg>
           </div>
           <!-- Testo con max-width animato -->
-          <div class="overflow-hidden transition-all ease-out duration-200"
+          <div class="overflow-hidden transition-all ease-out duration-200 flex items-center text-xs font-semibold h-6 whitespace-nowrap"
             :class="isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
             :style="{ transitionDelay: isCollapsed ? '0ms' : '200ms' }">
-            <span class="whitespace-nowrap text-xs font-semibold">Cos'è giamm.ai</span>
+            Cos'è giamm.ai
           </div>
         </button>
 
         <button @click="handleShowPrivacy"
           class="w-full rounded-lg hover:bg-bg-tertiary flex items-center text-text-primary cursor-pointer transition-colors px-2 py-1"
           :title="isCollapsed ? 'Privacy & Sicurezza' : ''">
-          <div class="w-8 h-8 flex justify-center items-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-              stroke="currentColor" class="size-4 shrink-0">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+          <div class="w-8 h-6 flex justify-center items-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="w-[18px] h-[18px] shrink-0">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
             </svg>
+
           </div>
           <!-- Testo con max-width animato -->
-          <div class="overflow-hidden transition-all ease-out duration-200"
+          <div class="overflow-hidden transition-all ease-out duration-200 flex items-center text-xs font-semibold h-6 whitespace-nowrap"
             :class="isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[180px] opacity-100'"
             :style="{ transitionDelay: isCollapsed ? '0ms' : '200ms' }">
-            <span class="whitespace-nowrap text-xs font-semibold">Privacy & Sicurezza</span>
+            Privacy & Sicurezza
           </div>
         </button>
       </div>
     </aside>
   </Transition>
+
+  <!-- Confirm Dialog -->
+  <ConfirmDialog ref="confirmDialog" />
 </template>
 
 <style scoped>
