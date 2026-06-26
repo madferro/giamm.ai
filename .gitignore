@@ -49,3 +49,7 @@ worker/.dev.vars
 worker/.wrangler/
 worker/node_modules/
 worker/dist/
+
+# Exclude all markdown files except README.md
+*.md
+!README.md
