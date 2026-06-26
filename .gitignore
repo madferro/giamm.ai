@@ -53,3 +53,6 @@ worker/dist/
 # Exclude all markdown files except README.md
 *.md
 !README.md
+
+# Internal tracking files
+BRANCH_SUMMARY.txt
