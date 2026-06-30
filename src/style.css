@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Dark mode basato sulla classe .dark (come fa l'app con toggleTheme) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-bg-primary: #fafaf9;
   --color-bg-secondary: #f5f5f4;
@@ -47,3 +50,27 @@ html.dark {
   }
 }
 
+.tooltip-giammai,
+.tooltip-giammai-absolute[aria-label][data-balloon-pos] {
+  --balloon-color: #1c1917;
+  --balloon-border-radius: 8px;
+  --balloon-font-size: 14px;
+}
+
+.tooltip-giammai:after,
+.tooltip-giammai:before,
+.tooltip-giammai-absolute:after,
+.tooltip-giammai-absolute:before{
+  @apply hidden lg:block;
+}
+
+.dark .tooltip-giammai,
+.dark .tooltip-giammai-absolute[aria-label][data-balloon-pos] {
+  --balloon-color: #f5f5f4;
+  --balloon-text-color: #1c1917;
+}
+
+.tooltip-giammai-absolute[aria-label][data-balloon-pos] {
+    position: absolute;
+    cursor: pointer;
+}

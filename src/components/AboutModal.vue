@@ -32,7 +32,7 @@ const emit = defineEmits(['close'])
   >
     <div
       v-if="show"
-      class="fixed top-0 right-0 bottom-0 z-[70] w-full max-w-2xl bg-bg-primary shadow-2xl overflow-y-auto"
+      class="fixed top-0 right-0 bottom-0 z-[70] w-full max-w-3xl bg-bg-primary shadow-2xl flex flex-col"
       @click.stop
     >
       <!-- Header -->
@@ -43,7 +43,7 @@ const emit = defineEmits(['close'])
           </h2>
           <button
             @click="$emit('close')"
-            class="w-10 h-10 rounded-lg flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors"
+            class="cursor-pointer w-10 h-10 rounded-lg flex items-center justify-center text-text-secondary hover:text-text-primary hover:bg-bg-secondary transition-colors"
             title="Chiudi"
           >
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -54,23 +54,20 @@ const emit = defineEmits(['close'])
       </div>
 
       <!-- Content -->
-      <div class="p-6 space-y-6 text-text-primary">
+      <div class="p-6 space-y-6 text-text-primary flex-1 overflow-y-auto">
         <!-- Intro -->
         <div class="space-y-3 text-sm">
           <p class="">
             <strong class="text-accent">giamm.ai</strong> è l'unico assistente AI che, invece di dirti "puoi farcela!", ti risponde "ma sei sicuro? Perché sembra una pessima idea".
           </p>
           <p class="">
-            Pensa a quell'amico cinico che smonta ogni tuo progetto prima ancora che tu apra il laptop. Quello che, quando gli dici "voglio aprire un ristorante", ti chiede se hai mai bruciato un toast senza farlo apposta. Esatto, quello lì. Solo che è un bot, lavora 24/7 e non ti deve una birra.
+            Pensa a quell'amico cinico che smonta ogni tuo progetto prima ancora che tu apra il laptop. Quello che, quando gli dici "voglio aprire un ristorante", ti chiede se hai mai bruciato un toast senza farlo apposta. Esatto, quello lì. Solo che è un bot, lavora 24/7, non ti deve una birra e <span class="text-accent font-bold">non è politically correct</span>.
           </p>
         </div>
 
         <!-- Filosofia -->
         <div class="space-y-4">
-          <h3 class="text-lg text-accent font-semibold flex items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-            </svg>
+          <h3 class="font-bold text-text-primary text-sm">
             La nostra (malinconica) filosofia
           </h3>
           
@@ -82,7 +79,7 @@ const emit = defineEmits(['close'])
                 </svg>
               </div>
               <div>
-                <h4 class="font-semibold text-text-primary mb-1">Demotivazione istantanea</h4>
+                <h4 class="font-semibold text-text-primary mb-1 text-sm">Demotivazione istantanea</h4>
                 <p class="text-sm text-text-secondary">
                   Perché incoraggiarti quando possiamo farti risparmiare mesi di sofferenza? Ti smontiamo subito, così non devi nemmeno iniziare.
                 </p>
@@ -96,7 +93,7 @@ const emit = defineEmits(['close'])
                 </svg>
               </div>
               <div>
-                <h4 class="font-semibold text-text-primary mb-1">Risposte veloci come il tuo fallimento</h4>
+                <h4 class="font-semibold text-text-primary mb-1 text-sm">Risposte veloci come il tuo fallimento</h4>
                 <p class="text-sm text-text-secondary">
                   Alimentato da Groq AI e Cloudflare per demolire i tuoi sogni a velocità supersonica. Zero latenza, massima delusione.
                 </p>
@@ -111,7 +108,7 @@ const emit = defineEmits(['close'])
                 </svg>
               </div>
               <div>
-                <h4 class="font-semibold text-text-primary mb-1">Privacy irrisoria</h4>
+                <h4 class="font-semibold text-text-primary mb-1 text-sm">Privacy irrisoria</h4>
                 <p class="text-sm text-text-secondary">
                   Tutto rimane nel tuo browser. Nemmeno noi vogliamo sapere che idea disastrosa stavi per realizzare.
                 </p>
@@ -126,7 +123,7 @@ const emit = defineEmits(['close'])
 
               </div>
               <div>
-                <h4 class="font-semibold text-text-primary mb-1">Cronologia delle tue debacle</h4>
+                <h4 class="font-semibold text-text-primary mb-1 text-sm">Cronologia delle tue debacle</h4>
                 <p class="text-sm text-text-secondary">
                   Salva ogni conversazione per ricordarti, quando sarai tentato di riprovare, quanto male è andata l'ultima volta.
                 </p>
@@ -137,35 +134,31 @@ const emit = defineEmits(['close'])
 
         <!-- Per chi è -->
         <div class="space-y-4">
-          <h3 class="text-lg font-bold text-accent flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-            </svg>
-
+          <h3 class="font-bold text-text-primary text-sm">
             Per chi è giamm.ai
           </h3>
           
           <ul class="space-y-2">
             <li class="flex items-start gap-2 text-accent text-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="mt-1 size-4 flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="mt-0.5 size-4 flex-shrink-0">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
               <span class="text-text-primary">Per chi ha un'idea geniale alle 3 di notte e la mattina dopo ha bisogno di qualcuno che gli dica "no, davvero no".</span>
             </li>
             <li class="flex items-start gap-2 text-accent text-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="mt-1 size-4 flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="mt-0.5 size-4 flex-shrink-0">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
               <span class="text-text-primary">Per chi vuole aprire un'attività ma non sa nemmeno come funziona il forno di casa.</span>
             </li>
             <li class="flex items-start gap-2 text-accent text-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="mt-1 size-4 flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="mt-0.5 size-4 flex-shrink-0">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
               <span class="text-text-primary">Per chi cerca un "sì, puoi farcela!" e invece trova un "e se poi te ne penti?".</span>
             </li>
             <li class="flex items-start gap-2 text-accent text-sm">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="mt-1 size-4 flex-shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="mt-0.5 size-4 flex-shrink-0">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
               <span class="text-text-primary">Per chi ha bisogno di una voce fuori dal coro che gli urla "smettila" prima che spenda i risparmi.</span>
@@ -176,11 +169,12 @@ const emit = defineEmits(['close'])
         <!-- Disclaimer -->
         <div class="p-4 rounded-lg bg-accent/5 border border-accent/20">
           <h4 class="font-semibold text-accent mb-2 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
             </svg>
-
+            <span class="text-text-primary text-sm font-bold">
             Disclaimer Legale
+            </span>
           </h4>
           <p class="text-sm text-text-secondary leading-relaxed">
             giamm.ai non è responsabile se, nonostante i nostri sforzi per dissuaderti, decidi comunque di farlo. Se apri quel ristorante, se lanci quella startup, se scrivi quel romanzo... e fallisci, non dirci che non ti avevamo avvertito. <em><strong>Perché lo abbiamo fatto. Più volte. In dettaglio.</strong></em>
@@ -189,12 +183,7 @@ const emit = defineEmits(['close'])
 
         <!-- Tech Stack -->
         <div class="space-y-4">
-          <h3 class="text-lg font-bold text-accent flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
-            </svg>
-
-
+          <h3 class="font-bold text-text-primary text-sm">
             Tecnologia che funziona (a differenza tua)
           </h3>
           
@@ -221,11 +210,12 @@ const emit = defineEmits(['close'])
         <!-- Footer -->
         
       </div>
-      <div class="py-6 border-t border-border">
-          <p class="text-sm text-text-muted text-center">
-            Fatto con <span class="text-accent">cattiveria</span> per chi ha idee e non dovrebbe realizzarle
-          </p>
-        </div>
+      <div class="py-4 border-t border-border">
+        <p class="text-sm text-text-muted text-center">
+          Fatto con <span class="text-accent">rancore</span> e un po' di talento. Anche noi abbiamo bisogno di giamm.ai.
+        </p>
+      </div>
+      
       <div class="px-6 py-4 border-t border-border">
           <button
             type="button"

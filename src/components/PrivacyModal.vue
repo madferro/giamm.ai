@@ -94,10 +94,7 @@ const rejectPrivacy = () => {
             giamm.ai è un'applicazione web a scopo ludico che fornisce risposte ironiche e umoristiche tramite sistemi di intelligenza artificiale.
           </p>
           <p class="text-text-secondary">
-            Per qualsiasi informazione relativa alla presente informativa è possibile contattare il titolare del sito all'indirizzo:
-          </p>
-          <p class="text-text-secondary mt-2">
-            <strong>Email:</strong> [TUO INDIRIZZO EMAIL]
+            Per qualsiasi informazione relativa alla presente informativa è possibile contattare il titolare del sito all'indirizzo email: <a href="mailto:lamentati@giamm.ai" class="text-accent" target="_blank">lamentati@giamm.ai</a>
           </p>
         </section>
 
