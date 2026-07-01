@@ -136,7 +136,7 @@ giamm.ai/
 │   │   ├── ToneSelector.vue       ← Scegli quanto vuoi soffrire
 │   │   ├── Sidebar.vue            ← La cronologia delle tue debacle
 │   │   ├── PrivacyModal.vue       ← Perché la legge ci obbliga
-│   │   ├── AboutModal.vue         ← Dove spieghiamo perché esistiamo (spoiler: nemmeno noi lo sappiamo)
+│   │   ├── AboutModal.vue         ← Dove spieghiamo perché esistiamo
 │   │   ├── CreditsModal.vue       ← I geni dietro questa pessima idea
 │   │   ├── ShareModal.vue         ← Condividi il dolore con gli amici
 │   │   ├── LimitsModal.vue        ← Perché solo 10 domande? Perché sì.
