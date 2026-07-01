@@ -125,26 +125,37 @@ Apri **http://localhost:5173** e prova a scrivere qualcosa.
 
 ```
 giamm.ai/
-├── src/                  ← Vue components (ironici per natura)
-│   ├── App.vue
+├── src/                      ← Vue components (ironici per natura)
+│   ├── App.vue               ← Il contenitore di tutte le tue future delusioni
+│   ├── main.js               ← Entry point, perché tutto deve iniziare da qualche parte
 │   ├── components/
-│   │   ├── WelcomeScreen.vue
-│   │   ├── ChatMessages.vue
-│   │   ├── ChatMessage.vue
-│   │   ├── ChatInput.vue
-│   │   ├── Sidebar.vue     ← La cronologia delle tue debacle
-│   │   ├── PrivacyModal.vue
-│   │   └── AboutModal.vue  ← Dove spieghiamo perché esistiamo
+│   │   ├── WelcomeScreen.vue      ← Ti dà il benvenuto (ma non troppo)
+│   │   ├── ChatMessages.vue       ← Mostra la cronologia dei tuoi fallimenti
+│   │   ├── ChatMessage.vue        ← Singolo messaggio (tuo o dell'AI cinica)
+│   │   ├── ChatInput.vue          ← Dove scrivi le tue idee terribili
+│   │   ├── ToneSelector.vue       ← Scegli quanto vuoi soffrire
+│   │   ├── Sidebar.vue            ← La cronologia delle tue debacle
+│   │   ├── PrivacyModal.vue       ← Perché la legge ci obbliga
+│   │   ├── AboutModal.vue         ← Dove spieghiamo perché esistiamo (spoiler: nemmeno noi lo sappiamo)
+│   │   ├── CreditsModal.vue       ← I geni dietro questa pessima idea
+│   │   ├── ShareModal.vue         ← Condividi il dolore con gli amici
+│   │   ├── LimitsModal.vue        ← Perché solo 10 domande? Perché sì.
+│   │   └── ConfirmDialog.vue      ← Per quando vuoi cancellare tutto (e chi ti biasima?)
 │   ├── utils/
-│   │   ├── db.js           ← IndexedDB per la cronologia (criptata!)
-│   │   └── crypto.js       ← AES-GCM, perché la vergogna va protetta
-│   └── style.css           ← Tailwind v4 con @theme
-├── worker/               ← Cloudflare Worker (il cervello cinico)
-│   ├── src/index.js      ← Gestisce le API e le risposte sarcastiche
+│   │   ├── db.js                  ← IndexedDB per la cronologia (criptata!)
+│   │   └── crypto.js              ← AES-GCM, perché la vergogna va protetta
+│   └── style.css                  ← Tailwind v4 con @theme (e un cuore che pulsa)
+├── worker/                   ← Cloudflare Worker (il cervello cinico)
+│   ├── src/index.js          ← Gestisce le API e le risposte sarcastiche
 │   ├── package.json
-│   └── wrangler.toml
-├── vite.config.js        ← Proxy verso il Worker
-└── README.md             ← Tu sei qui. Brutto posto per essere.
+│   ├── wrangler.toml         ← Configurazione Cloudflare
+│   └── .dev.vars.example     ← Template per la tua GROQ_API_KEY
+├── public/                   ← File statici (niente PHP, abbiamo imparato la lezione)
+│   └── favicon.ico           ← L'icona delle tue speranze infrante
+├── index.html                ← Il punto di partenza di tutto questo casino
+├── vite.config.js            ← Proxy verso il Worker
+├── package.json              ← Dipendenze frontend (troppe, come sempre)
+└── README.md                 ← Tu sei qui. Brutto posto per essere.
 ```
 
 ---
