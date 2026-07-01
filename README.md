@@ -213,7 +213,7 @@ npm install
 
 - **10 richieste al giorno per IP** — Perché l'AI deve riposare tra uno scoraggiamento e l'altro
 - La tua autostima potrebbe risentirne. Non è un bug, è una feature.
-- Il codice gira su Cloudflare Workers, quindi è veloce. Purtroppo anche le tue delusioni saranno distribuite globalmente con latenza < 50ms.
+- Il codice gira su Cloudflare Workers, quindi è veloce. Purtroppo anche le tue delusioni saranno servite con latenza < 50ms.
 
 ---
 
