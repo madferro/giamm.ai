@@ -145,13 +145,12 @@ defineExpose({ loadChatHistory })
       <!-- La sidebar dura 200ms. I testi durano 200ms. -->
 
       <!-- Header -->
-      <div class="py-5 flex items-center justify-between shrink-0"
-        :class="isCollapsed ? 'px-3' : 'px-5'">
+      <div class="py-5 flex items-center justify-between shrink-0 px-3">
         <!-- Titolo con max-width animato -->
         <div class="overflow-hidden transition-all ease-out duration-200"
           :class="isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[120px] opacity-100'"
           :style="{ transitionDelay: isCollapsed ? '0ms' : '200ms' }">
-            <a href="/" class="flex items-center gap-1 pl-1 font-bold text-sm tracking-tight text-text-primary">
+            <a href="/" class="flex items-center gap-1 pl-1 font-bold text-sm tracking-tight text-text-primary ml-2">
               <span>giamm</span><span class="w-2 h-2 rounded-full bg-accent"></span><span>ai</span>
             </a>
         </div>
@@ -267,7 +266,6 @@ defineExpose({ loadChatHistory })
       <div class="px-1 py-2 space-y-1 shrink-0">
         <button @click="handleShowAbout"
           class="tooltip-giammai w-full rounded-lg hover:bg-bg-tertiary flex items-center text-text-secondary cursor-pointer transition-colors px-2 py-1"
-          :title="isCollapsed ? 'Cos\'è giamm.ai' : ''"
           aria-label="Perdi due minuti del tuo tempo per capirci qualcosa di più" data-balloon-pos="right">
           <div class="w-8 h-6 flex justify-center items-center flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -285,7 +283,6 @@ defineExpose({ loadChatHistory })
         </button>
         <button @click="handleShowLimits"
           class="tooltip-giammai w-full rounded-lg hover:bg-bg-tertiary flex items-center text-text-secondary cursor-pointer transition-colors px-2 py-1"
-          :title="isCollapsed ? 'Perché solo 10?' : ''"
           aria-label="10 domande al giorno e stop. Scopri perché" data-balloon-pos="right">
           <div class="w-8 h-6 flex justify-center items-center flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px] shrink-0">
@@ -301,7 +298,6 @@ defineExpose({ loadChatHistory })
         </button>
         <button @click="handleShowPrivacy"
           class="tooltip-giammai w-full rounded-lg hover:bg-bg-tertiary flex items-center text-text-secondary cursor-pointer transition-colors px-2 py-1"
-          :title="isCollapsed ? 'Privacy & Sicurezza' : ''"
           aria-label="I tuoi dati sono al sicuro. Respira" data-balloon-pos="right">
           <div class="w-8 h-6 flex justify-center items-center flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -319,7 +315,6 @@ defineExpose({ loadChatHistory })
         </button>
         <button @click="handleShowCredits"
           class="tooltip-giammai w-full rounded-lg hover:bg-bg-tertiary flex items-center text-text-secondary cursor-pointer transition-colors px-2 py-1"
-          :title="isCollapsed ? 'I geni dietro' : ''"
           aria-label="Scopri chi ha avuto questa pessima idea" data-balloon-pos="right">
           <div class="w-8 h-6 flex justify-center items-center flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px] shrink-0">
@@ -336,7 +331,6 @@ defineExpose({ loadChatHistory })
         </button>
         <button @click="handleShowShare"
           class="tooltip-giammai w-full rounded-lg hover:bg-bg-tertiary flex items-center text-text-secondary cursor-pointer transition-colors px-2 py-1"
-          :title="isCollapsed ? 'Condividi' : ''"
           aria-label="Diffondi il verbo dello scoraggiamento" data-balloon-pos="right">
           <div class="w-8 h-6 flex justify-center items-center flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-[18px] h-[18px] shrink-0">
@@ -352,7 +346,6 @@ defineExpose({ loadChatHistory })
         </button>
         <a href="mailto:lamentati@giamm.ai" target="_blank"
           class="tooltip-giammai w-full rounded-lg hover:bg-bg-tertiary flex items-center text-text-secondary cursor-pointer transition-colors px-2 py-1"
-          :title="isCollapsed ? 'Scrivici e lamentati' : ''"
           aria-label="Lamentati pure, tanto non cambierà nulla" data-balloon-pos="right">
           <div class="w-8 h-6 flex justify-center items-center flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -367,6 +360,26 @@ defineExpose({ loadChatHistory })
             Scrivici e lamentati
           </div>
         </a>
+        <div 
+          :class="[
+            'mt-8 w-full flex items-center text-text-secondary px-2 py-1',
+            isCollapsed ? 'tooltip-giammai' : ''
+          ]"
+          :aria-label="isCollapsed ? 'Fatto con cinismo a Firenze, Italia.' : ''"
+          :data-balloon-pos="isCollapsed ? 'right' : undefined">
+          <div class="w-8 h-6 flex justify-center items-center flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 heart-filled">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+          </div>
+          <!-- Testo con max-width animato -->
+          <div class="overflow-hidden transition-all ease-out duration-200 flex flex-col items-start text-xs whitespace-nowrap"
+            :class="isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[280px] opacity-100'"
+            :style="{ transitionDelay: isCollapsed ? '0ms' : '200ms' }">
+            <span>Fatto con cinismo a Firenze, Italia.</span>
+            <span class="text-[10px] text-text-muted mt-0.5">© 2026 · Tutti i diritti riservati (ma chi li vuole)</span>
+          </div>
+        </div>
       </div>
     </aside>
   </Transition>

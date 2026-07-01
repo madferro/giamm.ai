@@ -42,11 +42,32 @@ html.dark {
   }
 }
 
+
+
 @layer components {
   .container {
     max-width: 960px !important;
     margin-left: auto !important;
     margin-right: auto !important;
+  }
+
+  /* Cuore rosso pieno con animazione pulsante */
+  .heart-filled {
+    fill: #f87171;
+    stroke: #f87171;
+    animation: heartbeat 1.5s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% {
+      transform: scale(1);
+    }
+    10%, 30% {
+      transform: scale(1.15);
+    }
+    20%, 40% {
+      transform: scale(1);
+    }
   }
 }
 
