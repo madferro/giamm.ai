@@ -155,7 +155,7 @@ giamm.ai/
 ├── index.html                ← Il punto di partenza di tutto questo casino
 ├── vite.config.js            ← Proxy verso il Worker
 ├── package.json              ← Dipendenze frontend (troppe, come sempre)
-└── README.md                 ← Tu sei qui. Brutto posto per essere.
+└── README.md                 ← Tu sei qui. Brutto posto dove essere.
 ```
 
 ---
