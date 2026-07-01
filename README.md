@@ -153,6 +153,7 @@ giamm.ai/
 ├── public/                   ← File statici (niente PHP, abbiamo imparato la lezione)
 │   └── favicon.ico           ← L'icona delle tue speranze infrante
 ├── index.html                ← Il punto di partenza di tutto questo casino
+├── LICENSE                   ← MIT. Fai quello che vuoi, ma le conseguenze sono tue
 ├── vite.config.js            ← Proxy verso il Worker
 ├── package.json              ← Dipendenze frontend (troppe, come sempre)
 └── README.md                 ← Tu sei qui. Brutto posto dove essere.
@@ -236,4 +237,4 @@ MIT — Fai quello che vuoi. Ma ricorda: ogni modifica che farai avrà conseguen
 
 ---
 
-Fatto con ironia (e un po' di Vue + Cloudflare) in Italia 🇮🇹
+Fatto con ironia e cinismo a Firenze, Italia 🇮🇹
