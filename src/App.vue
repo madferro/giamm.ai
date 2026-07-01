@@ -84,6 +84,8 @@ function handleResize() {
   } else {
     showSidebar.value = false
   }
+  // Controlla se mostrare/nascondere il pulsante scroll-to-bottom
+  onWindowScroll()
 }
 
 
@@ -412,13 +414,13 @@ async function sendMessage(text) {
       <!-- Header -->
       <header 
         :class="[
-          'fixed top-0 right-0 left-0 z-50 h-14 transition-all ease-out duration-200',
+          'fixed top-0 right-0 left-0 z-50 transition-all ease-out duration-200',
           sidebarCollapsed ? 'lg:left-14' : 'lg:left-72'
         ]"
         :style="{ transitionDelay: sidebarCollapsed ? '200ms' : '0ms' }"
       >
-        <div class="px-5 pt-5 h-full flex items-center justify-between">
-          <div class="flex items-center gap-3">
+        <div class="px-5 pt-5 pb-5 lg:pb-0 h-full flex items-center justify-between bg-bg-primary/40 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none">
+          <div class="flex items-center">
             <!-- Hamburger Menu (solo mobile) -->
             <button
               @click="toggleSidebar"
@@ -429,8 +431,12 @@ async function sendMessage(text) {
                 <path d="M3 12h18M3 6h18M3 18h18"/>
               </svg>
             </button>
+            <a href="/" class="lg:hidden flex items-center gap-1 pl-1 font-bold text-sm tracking-tight text-text-primary">
+              <span>giamm</span><span class="w-2 h-2 rounded-full bg-accent"></span><span>ai</span>
+            </a>
           </div>
           <div class="flex items-center gap-2">
+            
           <!-- Pulsante Cancella Chat (visibile solo se ci sono messaggi) -->
           <button
             v-if="hasMessages"

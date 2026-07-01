@@ -145,7 +145,8 @@ defineExpose({ loadChatHistory })
       <!-- La sidebar dura 200ms. I testi durano 200ms. -->
 
       <!-- Header -->
-      <div class="h-14 flex items-center justify-between px-3 shrink-0">
+      <div class="py-5 flex items-center justify-between shrink-0"
+        :class="isCollapsed ? 'px-3' : 'px-5'">
         <!-- Titolo con max-width animato -->
         <div class="overflow-hidden transition-all ease-out duration-200"
           :class="isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[120px] opacity-100'"
@@ -244,7 +245,7 @@ defineExpose({ loadChatHistory })
                   <!-- Pulsante cancella singola chat -->
                   <button
                     @click="handleDeleteChat(chat.sessionId, $event)"
-                    class="tooltip-giammai-absolute absolute right-1.5 bottom-1 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-md text-text-muted hover:text-red-400 hover:bg-red-400/10 cursor-pointer"
+                    class="tooltip-giammai-absolute absolute right-1.5 bottom-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-md text-text-muted hover:text-red-400 hover:bg-red-400/10 cursor-pointer"
                     aria-label="Cancella chat"
                     data-balloon-pos="up-right"
                   >
